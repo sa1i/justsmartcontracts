@@ -2,3 +2,12 @@
   display: flex;
   gap: 16px;
 }
+
+.pathItem {
+  padding: 8px;
+  font-weight: normal;
+
+  &.selected {
+    font-weight: bold;
+  }
+}

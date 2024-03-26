@@ -22,6 +22,5 @@ export const getTxUrl = (chain: Chain, txHash: string) => {
 
 export const getAddressUrl = (chain: Chain, address: string) => {
   const explorer = getChainConfig(chain).explorer;
-
-  return explorer ? `${explorer}address/${address}` : "";
+  return explorer ? `${explorer}/address/${address}` : "";
 };

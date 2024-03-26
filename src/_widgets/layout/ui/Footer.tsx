@@ -7,15 +7,9 @@ export const Footer = () => {
     <div className={styles.root}>
       <div className={styles.content}>
         <FlexHorizontal>
-          <ExternalLink href="https://github.com/olekon/justsmartcontracts">
+          <ExternalLink href="https://github.com/sa1i/justsmartcontracts">
             GitHub
           </ExternalLink>
-          <p>|</p>
-          <ExternalLink href="mailto:contact@justsmartcontracts.dev">
-            Email
-          </ExternalLink>
-          <p>|</p>
-          <p>Donations: 0x6d661B87C66D717F688d47796D7068B41D0a8730</p>
         </FlexHorizontal>
       </div>
     </div>

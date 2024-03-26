@@ -29,13 +29,14 @@ import {
 } from "viem/chains";
 
 import { Chain } from "./chains";
+import { heco } from "@shared/lib/web3/heco-chain";
 
 const ChainWagmiMap: Record<Chain, WagmiChain> = {
   [Chain.ARBITRUM]: arbitrum,
   [Chain.BSC]: bsc,
   [Chain.OPTIMISM]: optimism,
   [Chain.POLYGON]: polygon,
-  [Chain.ZKSYNC]: zkSync,
+  // [Chain.ZKSYNC]: zkSync,
   [Chain.AVALANCHE]: avalanche,
   [Chain.ETHEREUM]: mainnet,
   [Chain.ETH_GOERLI]: goerli,
@@ -43,22 +44,23 @@ const ChainWagmiMap: Record<Chain, WagmiChain> = {
   [Chain.POLYGON_MUMBAI]: polygonMumbai,
   [Chain.BASE]: base,
   [Chain.CRONOS]: cronos,
-  [Chain.KAVA]: kava,
+  // [Chain.KAVA]: kava,
   [Chain.MANTA]: manta,
-  [Chain.GNOSIS]: gnosis,
-  [Chain.CELO]: celo,
+  // [Chain.GNOSIS]: gnosis,
+  // [Chain.CELO]: celo,
   [Chain.MANTLE]: mantle,
-  [Chain.FANTOM]: fantom,
-  [Chain.MOONBEAM]: moonbeam,
+  // [Chain.FANTOM]: fantom,
+  // [Chain.MOONBEAM]: moonbeam,
   [Chain.LINEA]: linea,
-  [Chain.METIS]: metis,
-  [Chain.ASTAR]: astar,
-  [Chain.CANTO]: canto,
+  // [Chain.METIS]: metis,
+  // [Chain.ASTAR]: astar,
+  // [Chain.CANTO]: canto,
   [Chain.AURORA]: aurora,
-  [Chain.TELOS]: telos,
+  // [Chain.TELOS]: telos,
   [Chain.OKXCHAIN]: okc,
   [Chain.MOONRIVER]: moonriver,
   [Chain.BOBA]: boba,
+  [Chain.HECO]: heco,
 };
 
 export const toWagmiChain = (chain: Chain) => ChainWagmiMap[chain];

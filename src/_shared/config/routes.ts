@@ -9,7 +9,7 @@ export const Routes: TRouteInfo[] = [
     path: "/",
   },
   {
-    title: "Deploy",
+    title: "Deploy Contract",
     path: "/deploy",
   },
   // {

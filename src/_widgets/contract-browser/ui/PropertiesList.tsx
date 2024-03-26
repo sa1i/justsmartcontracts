@@ -32,6 +32,7 @@ export const PropertiesList = ({ contract }: TProps) => {
       rowKey="name"
       pagination={false}
       dataSource={functions}
+      scroll={{ x: true }}
       columns={columns}
     ></Table>
   );

@@ -1,4 +1,4 @@
-import { Button, Form, Input, Space } from "antd";
+import { Button, ConfigProvider, Form, Input, Space } from "antd";
 import { TTransactionParams } from "@shared/lib/tx";
 import { AddressInput } from "@shared/ui/AddressInput";
 import { Row, Col2, Col3, Col1 } from "@shared/ui/Grid";
@@ -117,9 +117,17 @@ export const SignTransactionForm = ({
 
       <Form.Item>
         <Space align="center">
-          <Button type="primary" htmlType="submit">
-            Sign
-          </Button>
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: "#fff506",
+              },
+            }}
+          >
+            <Button type="primary" htmlType="submit">
+              Sign
+            </Button>
+          </ConfigProvider>
 
           <DownloadTransaction fetchTxFields={() => form.getFieldsValue()} />
         </Space>

@@ -25,7 +25,7 @@ export const PropertyCall = ({ contract, abiItem }: TProps) => {
   }
 
   return (
-    <Space size="large">
+    <Space size="large" style={{ wordBreak: "break-word" }}>
       <Button onClick={() => refetch()} icon={<ReloadOutlined />}></Button>
       <ParamValue value={data} abiType={abiItem.outputs[0].type} />
     </Space>

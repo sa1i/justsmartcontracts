@@ -5,6 +5,8 @@ import { getAddressUrl } from "@shared/lib/web3";
 import { TContract } from "../model/types";
 
 import styles from "./SmallCard.module.scss";
+import { shortAddress } from "@shared/lib/web3/address";
+import { Tooltip } from "antd";
 
 type TProps = {
   contract: TContract;
@@ -19,7 +21,9 @@ export const SmallCard = ({ contract, extra }: TProps) => {
       href={getAddressUrl(contract.chain, contract.address)}
       className={styles.address}
     >
-      {contract.address}
+      <Tooltip title={contract.address} placement="right">
+        {shortAddress(contract.address)}
+      </Tooltip>
     </ExternalLink>
   ) : (
     <p className={styles.address}>{contract.address}</p>
