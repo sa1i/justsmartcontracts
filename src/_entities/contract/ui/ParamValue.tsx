@@ -19,9 +19,10 @@ export const ParamValue = ({ abiType, value }: TProps) => {
   if (abiType === "address[]") {
     return (
       <>
-        {(value as TAddress[]).map((v) => {
-          return <AddressValue key={v} value={v as TAddress} />;
-        })}
+        {value &&
+          (value as TAddress[]).map((v) => {
+            return <AddressValue key={v} value={v as TAddress} />;
+          })}
       </>
     );
   }
