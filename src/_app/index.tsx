@@ -9,7 +9,7 @@ import { chainModel } from "@entities/chain";
 import { NotificationsProvider } from "@shared/lib/notify";
 
 export const metadata = {
-  title: "JustSmartContracts",
+  title: "JustAnotherSmartContracts - Contract Interaction Tool",
   description: "Your tool to interact with smart contracts",
 };
 
