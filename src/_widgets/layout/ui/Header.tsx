@@ -3,6 +3,7 @@ import { Navigation } from "./Navigation";
 import { SetCurrentChain } from "@features/set-current-chain";
 import { WalletCard, walletModel } from "@entities/wallet";
 import { ConnectButton } from "@features/connect-wallet";
+import { ContractImportExportButton } from "@features/import-export-contracts";
 
 import styles from "./Header.module.scss";
 
@@ -21,11 +22,15 @@ export const Header = () => {
     <div className={styles.root}>
       <div className={styles.content}>
         <Navigation pages={Routes} />
+
         <div className={styles.wallet}>
           <WalletBlock />
         </div>
         <div className={styles.chainSelect}>
           <SetCurrentChain />
+        </div>
+        <div className={styles.importExport}>
+          <ContractImportExportButton />
         </div>
       </div>
     </div>

@@ -26,6 +26,8 @@ type TActions = {
   ) => void;
   remove: (_id: TUid) => void;
   setCurrent: (_id: TUid | null) => void;
+  importContracts: (_contracts: TContract[]) => void;
+  exportContracts: () => TContract[];
 };
 
 const useContractStore = create<TState & TActions>()(
@@ -84,6 +86,15 @@ const useContractStore = create<TState & TActions>()(
         set((s: TState) => {
           s.currentId = id;
         });
+      },
+      importContracts: (contracts: TContract[]) => {
+        set((s: TState) => {
+          s.contracts = contracts;
+        });
+      },
+
+      exportContracts: (): TContract[] => {
+        return useContractStore.getState().contracts;
       },
     })),
     { name: "contracts_" }
