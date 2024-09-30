@@ -12,6 +12,7 @@ export enum Chain {
   POLYGON_MUMBAI = 80001,
   BASE = 8453,
   CRONOS = 25,
+  SCROLL = 534352,
   // KAVA = 2222,
   MANTA = 169,
   // GNOSIS = 100,
