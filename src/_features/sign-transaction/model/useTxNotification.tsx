@@ -5,7 +5,7 @@ import {
 } from "@shared/lib/notify";
 import { Chain, THexString, getTxUrl } from "@shared/lib/web3";
 import { ExternalLink } from "@shared/ui/ExternalLink";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 type Status = "pending" | "confirmed" | "failed";
 
@@ -41,7 +41,7 @@ export const useWatchTxNotification = (
 ) => {
   const notify = useTxNotification();
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 

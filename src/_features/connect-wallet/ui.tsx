@@ -2,7 +2,7 @@ import { Button, ConfigProvider } from "antd";
 import { useConnectWallet } from "./model";
 
 export const ConnectButton = () => {
-  const connect = useConnectWallet();
+  const connectWithMetaMask = useConnectWallet();
 
   return (
     <ConfigProvider
@@ -12,7 +12,7 @@ export const ConnectButton = () => {
         },
       }}
     >
-      <Button onClick={() => connect()} size="middle" type="primary">
+      <Button onClick={connectWithMetaMask} size="middle" type="primary">
         Connect wallet
       </Button>
     </ConfigProvider>

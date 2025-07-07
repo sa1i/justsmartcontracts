@@ -1,10 +1,13 @@
 import { useConnect } from "wagmi";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { injected } from "wagmi/connectors";
 
 export const useConnectWallet = () => {
-  const { connect } = useConnect({
-    connector: new MetaMaskConnector(),
-  });
+  const { connect } = useConnect();
 
-  return connect;
+  const connectWithMetaMask = async () => {
+    const connector = injected();
+    await connect({ connector });
+  };
+
+  return connectWithMetaMask;
 };

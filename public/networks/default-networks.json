@@ -1,0 +1,222 @@
+[
+  {
+    "chainId": 1,
+    "name": "Ethereum Mainnet",
+    "shortName": "eth",
+    "chain": "ETH",
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://ethereum.publicnode.com",
+      "https://rpc.ankr.com/eth",
+      "https://eth.llamarpc.com",
+      "https://ethereum.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "Etherscan",
+        "url": "https://etherscan.io",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://ethereum.org",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 137,
+    "name": "Polygon Mainnet",
+    "shortName": "matic",
+    "chain": "Polygon",
+    "nativeCurrency": {
+      "name": "MATIC",
+      "symbol": "MATIC",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://polygon.llamarpc.com",
+      "https://rpc.ankr.com/polygon",
+      "https://polygon.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "PolygonScan",
+        "url": "https://polygonscan.com",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://polygon.technology/",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 56,
+    "name": "BNB Smart Chain Mainnet",
+    "shortName": "bnb",
+    "chain": "BSC",
+    "nativeCurrency": {
+      "name": "BNB Chain Native Token",
+      "symbol": "BNB",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://bsc.publicnode.com",
+      "https://rpc.ankr.com/bsc",
+      "https://bsc.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "BscScan",
+        "url": "https://bscscan.com",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://www.bnbchain.org/en",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 42161,
+    "name": "Arbitrum One",
+    "shortName": "arb1",
+    "chain": "ETH",
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://arbitrum.llamarpc.com",
+      "https://rpc.ankr.com/arbitrum",
+      "https://arbitrum.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "Arbiscan",
+        "url": "https://arbiscan.io",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://arbitrum.io",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 10,
+    "name": "OP Mainnet",
+    "shortName": "oeth",
+    "chain": "ETH",
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://optimism.llamarpc.com",
+      "https://rpc.ankr.com/optimism",
+      "https://optimism.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "Optimistic Ethereum Explorer",
+        "url": "https://optimistic.etherscan.io",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://optimism.io",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 8453,
+    "name": "Base",
+    "shortName": "base",
+    "chain": "ETH",
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://base.llamarpc.com",
+      "https://rpc.ankr.com/base",
+      "https://base.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "BaseScan",
+        "url": "https://basescan.org",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [],
+    "infoURL": "https://base.org",
+    "testnet": false,
+    "status": "active"
+  },
+  {
+    "chainId": 11155111,
+    "name": "Sepolia",
+    "shortName": "sep",
+    "chain": "ETH",
+    "nativeCurrency": {
+      "name": "Sepolia Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://ethereum-sepolia.publicnode.com",
+      "https://rpc.ankr.com/eth_sepolia",
+      "https://sepolia.blockpi.network/v1/rpc/public"
+    ],
+    "blockExplorers": [
+      {
+        "name": "Etherscan",
+        "url": "https://sepolia.etherscan.io",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [
+      "https://sepoliafaucet.com"
+    ],
+    "infoURL": "https://sepolia.otterscan.io",
+    "testnet": true,
+    "status": "active"
+  },
+  {
+    "chainId": 80001,
+    "name": "Mumbai",
+    "shortName": "maticmum",
+    "chain": "Polygon",
+    "nativeCurrency": {
+      "name": "MATIC",
+      "symbol": "MATIC",
+      "decimals": 18
+    },
+    "rpcUrls": [
+      "https://polygon-mumbai.blockpi.network/v1/rpc/public",
+      "https://rpc.ankr.com/polygon_mumbai"
+    ],
+    "blockExplorers": [
+      {
+        "name": "PolygonScan",
+        "url": "https://mumbai.polygonscan.com",
+        "standard": "EIP3091"
+      }
+    ],
+    "faucets": [
+      "https://faucet.polygon.technology/"
+    ],
+    "infoURL": "https://polygon.technology/",
+    "testnet": true,
+    "status": "active"
+  }
+]

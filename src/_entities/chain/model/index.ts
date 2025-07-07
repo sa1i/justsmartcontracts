@@ -40,6 +40,8 @@ export const SupportedChains = [
   // Chain.TELOS,
   Chain.OKXCHAIN,
   Chain.MOONRIVER,
+  Chain.ZERO,
+  Chain.STORY,
 ];
 
 const useCurrentChainStore = create<State & Actions>()(

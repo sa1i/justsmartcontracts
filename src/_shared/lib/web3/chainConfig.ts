@@ -9,10 +9,13 @@ type TChainConfig = {
 
 export const getChainConfig = (chain: Chain): TChainConfig => {
   const wagmiChain = toWagmiChain(chain);
+  // console.log("==> chain:", chain);
+  // console.log("--> wagmiChain:", wagmiChain);
+
   return {
-    name: wagmiChain.name,
-    explorer: wagmiChain.blockExplorers?.default.url || "",
-    testnet: wagmiChain.testnet || false,
+    name: wagmiChain?.name ?? "",
+    explorer: wagmiChain?.blockExplorers?.etherscan?.url ?? "",
+    testnet: wagmiChain?.network?.includes("test") ?? false,
   };
 };
 

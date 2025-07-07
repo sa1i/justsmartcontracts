@@ -4,6 +4,7 @@ import { SetCurrentChain } from "@features/set-current-chain";
 import { WalletCard, walletModel } from "@entities/wallet";
 import { ConnectButton } from "@features/connect-wallet";
 import { ContractImportExportButton } from "@features/import-export-contracts";
+import { NetworkRpcPanel } from "@features/network-selector";
 
 import styles from "./Header.module.scss";
 
@@ -27,7 +28,7 @@ export const Header = () => {
           <WalletBlock />
         </div>
         <div className={styles.chainSelect}>
-          <SetCurrentChain />
+          <NetworkRpcPanel layout="compact" size="small" />
         </div>
         <div className={styles.importExport}>
           <ContractImportExportButton />

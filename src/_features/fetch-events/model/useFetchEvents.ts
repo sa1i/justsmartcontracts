@@ -30,9 +30,11 @@ export const useFetchEvents = (contract: TContract, event: TAbiEvent) => {
         }),
       };
 
-      client
-        // @ts-ignore: no way I am going to make it properly typescript-compatible
-        .getLogs(config)
+      (client
+        ? // @ts-ignore: no way I am going to make it properly typescript-compatible
+          client.getLogs(config)
+        : Promise.reject(new Error("Client not available"))
+      )
         .then((result) => {
           setEvents(result);
         })

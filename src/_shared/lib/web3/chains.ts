@@ -30,4 +30,6 @@ export enum Chain {
   MOONRIVER = 1285,
   BOBA = 288,
   HECO = 128,
+  ZERO = 543210,
+  STORY = 1514,
 }

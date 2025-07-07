@@ -5,6 +5,7 @@ import { Input, Upload } from "antd";
 import { RcFile } from "antd/es/upload";
 import { useState } from "react";
 import { isHex } from "viem";
+import { AbiInput } from "@shared/ui/AbiInput";
 
 type TProps = {
   onChange: (_abi: TAbiItem[], _byteCode: THexString) => void;
@@ -78,12 +79,13 @@ export const DeployForm = ({ onChange }: TProps) => {
       </Row>
       <Row>
         <Col2>
-          <Input.TextArea
-            rows={20}
-            status={abiError && "error"}
-            onChange={(e) => handleAbiChange(e.target.value)}
+          <AbiInput
             value={abi}
+            onChange={handleAbiChange}
+            rows={20}
+            placeholder="Enter ABI JSON for deployment..."
           />
+          {abiError && <div style={{ color: "red", marginTop: "4px" }}>{abiError}</div>}
         </Col2>
         <Col2>
           <Input.TextArea
