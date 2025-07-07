@@ -1,101 +1,51 @@
 import type { Chain as WagmiChain } from "viem";
 import { http } from "viem";
-import {
-  mainnet,
-  sepolia,
-  arbitrum,
-  goerli,
-  bsc,
-  optimism,
-  polygon,
-  // zkSync,
-  avalanche,
-  polygonMumbai,
-  cronos,
-  // kava,
-  manta,
-  base,
-  // gnosis,
-  // celo,
-  mantle,
-  // fantom,
-  // moonbeam,
-  linea,
-  aurora,
-  okc,
-  moonriver,
-  boba,
-  scroll,
-} from "viem/chains";
-
-import { Chain } from "./chains";
-import { heco } from "@shared/lib/web3/heco-chain";
-import { zero } from "@shared/lib/web3/zero-chain";
-import { story } from "@shared/lib/web3/story-chain";
 import { networkConfigToViemChain } from "../chainlist/adapter";
 import type { NetworkConfig } from "../chainlist/types";
 
-const ChainWagmiMap: Record<Chain, WagmiChain> = {
-  [Chain.ETHEREUM]: mainnet,
-  [Chain.ETH_GOERLI]: goerli,
-  [Chain.OPTIMISM]: optimism,
-  [Chain.BSC]: bsc,
-  [Chain.ARBITRUM]: arbitrum,
-  [Chain.POLYGON]: polygon,
-  // [Chain.ZKSYNC]: zkSync,
-  [Chain.AVALANCHE]: avalanche,
-
-  [Chain.ETH_SEPOLIA]: sepolia,
-  [Chain.POLYGON_MUMBAI]: polygonMumbai,
-  [Chain.BASE]: base,
-  [Chain.CRONOS]: cronos,
-  [Chain.SCROLL]: scroll,
-  // [Chain.KAVA]: kava,
-  [Chain.MANTA]: manta,
-  // [Chain.GNOSIS]: gnosis,
-  // [Chain.CELO]: celo,
-  [Chain.MANTLE]: mantle,
-  // [Chain.FANTOM]: fantom,
-  // [Chain.MOONBEAM]: moonbeam,
-  [Chain.LINEA]: linea,
-  // [Chain.METIS]: metis,
-  // [Chain.ASTAR]: astar,
-  // [Chain.CANTO]: canto,
-  [Chain.AURORA]: aurora,
-  // [Chain.TELOS]: telos,
-  [Chain.OKXCHAIN]: okc,
-  [Chain.MOONRIVER]: moonriver,
-  [Chain.BOBA]: boba,
-  [Chain.HECO]: heco,
-  [Chain.ZERO]: zero,
-  [Chain.STORY]: story,
-};
-
-export const toWagmiChain = (chain: Chain) => ChainWagmiMap[chain];
+// 移除所有预置网络映射，现在完全使用动态网络配置
 
 /**
- * 获取所有支持的 Wagmi 链
- * 这个函数返回所有在 ChainWagmiMap 中定义的链，确保 wagmi 配置包含所有支持的链
+ * 从网络配置列表获取所有支持的 Wagmi 链
  */
-export const getAllSupportedWagmiChains = (): WagmiChain[] => {
-  return Object.values(ChainWagmiMap);
+export const getAllSupportedWagmiChains = (networks: NetworkConfig[]): WagmiChain[] => {
+  if (!networks || networks.length === 0) {
+    return [];
+  }
+  
+  try {
+    return networks
+      .map(network => networkConfigToViemChain(network))
+      .filter((chain): chain is WagmiChain => chain !== null);
+  } catch (error) {
+    console.error('Error creating wagmi chains:', error);
+    return [];
+  }
 };
 
 /**
- * 获取所有支持的链的传输配置
- * 为每个支持的链创建默认的传输配置
+ * 从网络配置列表获取传输配置
  */
-export const getAllSupportedTransports = (): Record<number, any> => {
+export const getAllSupportedTransports = (networks: NetworkConfig[]): Record<number, any> => {
   const transports: Record<number, any> = {};
 
-  Object.entries(ChainWagmiMap).forEach(([chainEnum, wagmiChain]) => {
-    const chainId = parseInt(chainEnum);
-    // 为每个链创建默认的 HTTP 传输
-    const defaultRpc = wagmiChain.rpcUrls.default.http[0];
-    if (defaultRpc) {
-      transports[chainId] = http(defaultRpc);
-    }
-  });
+  if (!networks || networks.length === 0) {
+    return transports;
+  }
+
+  try {
+    networks.forEach(network => {
+      if (network && network.rpcUrls && network.rpcUrls.length > 0) {
+        // 使用网络的第一个有效 RPC 作为默认传输
+        const validRpc = network.rpcUrls.find(url => url && typeof url === 'string');
+        if (validRpc) {
+          transports[network.chainId] = http(validRpc);
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error creating transports:', error);
+  }
 
   return transports;
 };
@@ -110,14 +60,16 @@ const DynamicChainCache = new Map<number, WagmiChain>();
  */
 export const createWagmiChainFromNetwork = (
   network: NetworkConfig
-): WagmiChain => {
+): WagmiChain | null => {
   const cached = DynamicChainCache.get(network.chainId);
   if (cached) {
     return cached;
   }
 
   const wagmiChain = networkConfigToViemChain(network);
-  DynamicChainCache.set(network.chainId, wagmiChain);
+  if (wagmiChain) {
+    DynamicChainCache.set(network.chainId, wagmiChain);
+  }
   return wagmiChain;
 };
 
@@ -140,7 +92,9 @@ export const getAllowedContractChains = (
 
     if (status.allowed) {
       const wagmiChain = createWagmiChainFromNetwork(network);
-      allowedChains.push(wagmiChain);
+      if (wagmiChain) {
+        allowedChains.push(wagmiChain);
+      }
     }
   }
 

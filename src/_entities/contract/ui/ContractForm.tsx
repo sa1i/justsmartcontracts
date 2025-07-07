@@ -124,9 +124,9 @@ const CustomChainInput = ({
   ) : null;
 
 export const ContractForm = ({ buttonText, value, onSubmit }: TProps) => {
-  const { chain } = chainModel.useCurrentChain();
+  const { chainId } = chainModel.useCurrentChain();
 
-  const initialValue = value || { chain, abi: [] };
+  const initialValue = value || { chain: chainId, abi: [] };
 
   const textFormValues = {
     ...initialValue,

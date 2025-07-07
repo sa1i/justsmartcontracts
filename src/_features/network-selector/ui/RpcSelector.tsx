@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Modal,
   List,
@@ -13,6 +13,7 @@ import {
   Tooltip,
   Tag,
   Spin,
+  Select,
 } from "antd";
 import {
   PlusOutlined,
@@ -24,6 +25,7 @@ import {
   ThunderboltOutlined,
   LoadingOutlined,
   ClockCircleOutlined,
+  SortAscendingOutlined,
 } from "@ant-design/icons";
 import {
   useNetworkSelection,
@@ -68,8 +70,54 @@ export const RpcSelector: React.FC<RpcSelectorProps> = ({
     new Map()
   );
   const [isTesting, setIsTesting] = useState(false);
+  
+  // 排序相关状态
+  const [sortBy, setSortBy] = useState<'default' | 'blockHeight' | 'responseTime'>('default');
 
   const rpcs = getCurrentNetworkRpcs();
+
+  // 根据测试结果排序RPC列表
+  const sortedRpcs = useMemo(() => {
+    if (testResults.size === 0) return rpcs;
+
+    return [...rpcs].sort((a, b) => {
+      const resultA = testResults.get(a.url);
+      const resultB = testResults.get(b.url);
+
+      // 如果没有测试结果，保持原顺序
+      if (!resultA || !resultB) {
+        if (!resultA && !resultB) return 0;
+        if (!resultA) return 1;
+        return -1;
+      }
+
+      // 失败的排在最后
+      if (resultA.status !== 'success' && resultB.status !== 'success') {
+        return 0; // 都失败，保持原顺序
+      }
+      if (resultA.status !== 'success') return 1;
+      if (resultB.status !== 'success') return -1;
+
+      // 都成功的情况下，按照块高优先，响应时间其次
+      // 块高：高的排前面
+      if (resultA.blockNumber && resultB.blockNumber) {
+        if (resultA.blockNumber !== resultB.blockNumber) {
+          return resultB.blockNumber - resultA.blockNumber;
+        }
+      } else if (resultA.blockNumber) {
+        return -1; // A有块高，B没有，A排前面
+      } else if (resultB.blockNumber) {
+        return 1; // B有块高，A没有，B排前面
+      }
+
+      // 响应时间：快的排前面
+      if (resultA.responseTime && resultB.responseTime) {
+        return resultA.responseTime - resultB.responseTime;
+      }
+
+      return 0;
+    });
+  }, [rpcs, testResults]);
 
   const handleRpcSelect = (index: number) => {
     selectRpc(index);
@@ -320,40 +368,31 @@ export const RpcSelector: React.FC<RpcSelectorProps> = ({
   return (
     <Modal
       title={
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Space>
-            <GlobalOutlined />
-            <span>RPC Endpoints - {selectedNetwork.name}</span>
-          </Space>
-          <Button
-            type="primary"
-            icon={<ThunderboltOutlined />}
-            onClick={testAllRpcs}
-            loading={isTesting}
-            size="small"
-          >
-            {isTesting ? "Testing..." : "Test All"}
-          </Button>
-        </div>
+        <Space>
+          <GlobalOutlined />
+          <span>RPC Endpoints - {selectedNetwork.name}</span>
+        </Space>
       }
       open={visible}
       onCancel={onClose}
       footer={null}
       width={700}
     >
-      {/* 添加自定义 RPC 按钮 */}
-      <div style={{ marginBottom: 16 }}>
+      {/* 顶部操作区 */}
+      <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+        <Button
+          type="primary"
+          icon={<ThunderboltOutlined />}
+          onClick={testAllRpcs}
+          loading={isTesting}
+        >
+          {isTesting ? "Testing..." : "Test All"}
+        </Button>
         <Button
           type="dashed"
           icon={<PlusOutlined />}
           onClick={() => setShowAddForm(true)}
-          block
+          style={{ flex: 1 }}
         >
           Add Custom RPC
         </Button>
@@ -415,8 +454,11 @@ export const RpcSelector: React.FC<RpcSelectorProps> = ({
 
       {/* RPC 列表 */}
       <List
-        dataSource={rpcs}
-        renderItem={(rpc, index) => (
+        dataSource={sortedRpcs}
+        renderItem={(rpc, index) => {
+          // 找到原始索引用于选择
+          const originalIndex = rpcs.findIndex(r => r.url === rpc.url);
+          return (
           <List.Item
             key={rpc.url}
             actions={[
@@ -448,19 +490,19 @@ export const RpcSelector: React.FC<RpcSelectorProps> = ({
               title={
                 <Space>
                   <Button
-                    type={index === selectedRpcIndex ? "primary" : "default"}
+                    type={originalIndex === selectedRpcIndex ? "primary" : "default"}
                     size="small"
-                    onClick={() => handleRpcSelect(index)}
+                    onClick={() => handleRpcSelect(originalIndex)}
                     icon={
-                      index === selectedRpcIndex ? (
+                      originalIndex === selectedRpcIndex ? (
                         <CheckCircleOutlined />
                       ) : undefined
                     }
                   >
-                    {index === selectedRpcIndex ? "Active" : "Select"}
+                    {originalIndex === selectedRpcIndex ? "Active" : "Select"}
                   </Button>
                   <Text strong>{rpc.name}</Text>
-                  {getRpcStatus(rpc, index)}
+                  {getRpcStatus(rpc, originalIndex)}
                 </Space>
               }
               description={
@@ -473,7 +515,8 @@ export const RpcSelector: React.FC<RpcSelectorProps> = ({
               }
             />
           </List.Item>
-        )}
+          );
+        }}
       />
 
       {/* 底部信息 */}

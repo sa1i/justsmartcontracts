@@ -1,35 +1,6 @@
 /* eslint-disable no-unused-vars */
+// 保留作为类型定义，但不再使用预置网络
 export enum Chain {
-  ETHEREUM = 1,
-  ETH_GOERLI = 5,
-  OPTIMISM = 10,
-  BSC = 56,
-  POLYGON = 137,
-  // ZKSYNC = 324,
-  ARBITRUM = 42161,
-  AVALANCHE = 43114,
-  ETH_SEPOLIA = 11155111,
-  POLYGON_MUMBAI = 80001,
-  BASE = 8453,
-  CRONOS = 25,
-  SCROLL = 534352,
-  // KAVA = 2222,
-  MANTA = 169,
-  // GNOSIS = 100,
-  // CELO = 42220,
-  MANTLE = 5000,
-  // FANTOM = 250,
-  // MOONBEAM = 1284,
-  LINEA = 59144,
-  // METIS = 1088,
-  // ASTAR = 592,
-  // CANTO = 7700,
-  AURORA = 1313161554,
-  // TELOS = 40,
-  OKXCHAIN = 66,
-  MOONRIVER = 1285,
-  BOBA = 288,
-  HECO = 128,
-  ZERO = 543210,
-  STORY = 1514,
+  // 已移除所有预置网络定义
+  // 现在使用动态网络配置
 }

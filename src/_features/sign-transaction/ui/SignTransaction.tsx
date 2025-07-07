@@ -17,7 +17,7 @@ export const SignTransaction = ({ contract, abiItem, args }: TProps) => {
 
   // 使用当前选中的网络，如果没有选中则使用合约的原始链
   const chainToUse = selectedNetwork
-    ? mapNetworkToChainEnum(selectedNetwork) || contract.chain
+    ? mapNetworkToChainEnum(selectedNetwork)
     : contract.chain;
 
   console.log(`chain to use:`, chainToUse);

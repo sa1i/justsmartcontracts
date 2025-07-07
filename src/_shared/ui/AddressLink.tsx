@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Tooltip } from "antd";
+import { Typography, Tooltip, Button } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import { LinkOutlined } from "@ant-design/icons";
 import { TAddress } from "@shared/lib/web3";
@@ -60,7 +60,15 @@ export const AddressLink: React.FC<AddressLinkProps> = ({
   const displayAddress = showShort ? shortAddress(address) : address;
 
   return (
-    <span className={className} style={style}>
+    <span 
+      className={className} 
+      style={{ 
+        display: "inline-flex", 
+        alignItems: "center", 
+        gap: "8px",
+        ...style 
+      }}
+    >
       <Tooltip title={`Full address: ${address}`}>
         {explorerUrl ? (
           <Link
@@ -82,23 +90,28 @@ export const AddressLink: React.FC<AddressLinkProps> = ({
             code
             style={{
               fontFamily: "monospace",
-              cursor: showCopy ? "pointer" : "default",
+              cursor: "default",
             }}
-            onClick={showCopy ? handleCopy : undefined}
           >
             {displayAddress}
-            {showCopy && (
-              <CopyOutlined
-                style={{
-                  fontSize: "12px",
-                  marginLeft: "4px",
-                  opacity: 0.6,
-                }}
-              />
-            )}
           </Text>
         )}
       </Tooltip>
+      {showCopy && (
+        <Tooltip title="Copy full address">
+          <Button
+            type="text"
+            size="small"
+            icon={<CopyOutlined />}
+            onClick={handleCopy}
+            style={{
+              padding: "0 4px",
+              height: "auto",
+              minWidth: "auto",
+            }}
+          />
+        </Tooltip>
+      )}
     </span>
   );
 };

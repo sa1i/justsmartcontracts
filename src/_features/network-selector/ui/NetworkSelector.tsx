@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Modal,
   Input,
@@ -43,6 +43,10 @@ interface NetworkSelectorProps {
   onNetworkSelect: (network: NetworkConfig) => void;
 }
 
+// 默认显示的网络数量
+const INITIAL_DISPLAY_COUNT = 10;
+const LOAD_MORE_COUNT = 20;
+
 export const NetworkSelector: React.FC<NetworkSelectorProps> = ({
   visible,
   onClose,
@@ -55,12 +59,78 @@ export const NetworkSelector: React.FC<NetworkSelectorProps> = ({
     useNetworkFilters();
   const { getNetworkPermission } = useNetworkPermissions();
 
+  // 本地搜索状态（用于输入框）
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+  // 显示的网络数量
+  const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
+  // 防抖定时器
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+
   // 初始化数据
   useEffect(() => {
     if (visible && networks.length === 0 && !isLoading) {
       fetchNetworks();
     }
   }, [visible, networks.length, isLoading, fetchNetworks]);
+
+  // 当模态框打开时重置显示数量
+  useEffect(() => {
+    if (visible) {
+      setDisplayCount(INITIAL_DISPLAY_COUNT);
+      setLocalSearchQuery(searchQuery);
+    }
+  }, [visible, searchQuery]);
+
+  // 清理防抖定时器
+  useEffect(() => {
+    return () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+    };
+  }, [debounceTimer]);
+
+  // 处理搜索输入（带防抖）
+  const handleSearchChange = useCallback((value: string) => {
+    setLocalSearchQuery(value);
+    
+    // 清除之前的定时器
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    
+    // 设置新的定时器
+    const timer = setTimeout(() => {
+      setSearchQuery(value);
+      setDisplayCount(INITIAL_DISPLAY_COUNT); // 重置显示数量
+    }, 300); // 300ms 防抖延迟
+    
+    setDebounceTimer(timer);
+  }, [debounceTimer, setSearchQuery]);
+
+  // 计算要显示的网络列表
+  const displayNetworks = useMemo(() => {
+    // 如果没有搜索，确保当前选中的网络在列表中
+    if (!searchQuery && selectedNetwork) {
+      const selectedIndex = networks.findIndex(n => n.chainId === selectedNetwork.chainId);
+      if (selectedIndex >= displayCount) {
+        // 如果选中的网络不在显示范围内，将其加入到开头
+        const otherNetworks = networks.filter(n => n.chainId !== selectedNetwork.chainId);
+        return [selectedNetwork, ...otherNetworks.slice(0, displayCount - 1)];
+      }
+    }
+    
+    // 正常情况下，返回前 displayCount 个网络
+    return networks.slice(0, displayCount);
+  }, [networks, displayCount, searchQuery, selectedNetwork]);
+
+  // 是否显示"加载更多"按钮
+  const showLoadMore = networks.length > displayCount;
+
+  // 加载更多网络
+  const handleLoadMore = () => {
+    setDisplayCount(prev => Math.min(prev + LOAD_MORE_COUNT, networks.length));
+  };
 
   const handleNetworkSelect = (network: NetworkConfig) => {
     onNetworkSelect(network);
@@ -155,8 +225,8 @@ export const NetworkSelector: React.FC<NetworkSelectorProps> = ({
           <Input
             placeholder="Search networks..."
             prefix={<SearchOutlined />}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={localSearchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
             style={{ flex: 1, marginRight: 8 }}
             allowClear
           />
@@ -227,7 +297,7 @@ export const NetworkSelector: React.FC<NetworkSelectorProps> = ({
           </div>
         ) : (
           <List
-            dataSource={networks}
+            dataSource={displayNetworks}
             renderItem={(network) => (
               <List.Item
                 key={network.chainId}
@@ -272,10 +342,19 @@ export const NetworkSelector: React.FC<NetworkSelectorProps> = ({
               </List.Item>
             )}
             locale={{
-              emptyText: searchQuery
-                ? `No networks found for "${searchQuery}"`
+              emptyText: localSearchQuery
+                ? `No networks found for "${localSearchQuery}"`
                 : "No networks available",
             }}
+            loadMore={
+              showLoadMore ? (
+                <div style={{ textAlign: "center", marginTop: 12, marginBottom: 12 }}>
+                  <Button onClick={handleLoadMore}>
+                    Load More ({networks.length - displayCount} remaining)
+                  </Button>
+                </div>
+              ) : null
+            }
           />
         )}
       </div>

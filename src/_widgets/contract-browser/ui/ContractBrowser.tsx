@@ -130,7 +130,7 @@ export const ContractBrowser = () => {
           </Space>
           <Space>
             <Text type="secondary">Contract Address:</Text>
-            <AddressLink address={contract.address} />
+            <AddressLink address={contract.address} showCopy={true} />
           </Space>
         </Space>
       </div>

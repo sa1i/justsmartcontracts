@@ -184,7 +184,10 @@ export const ProxyContractInfo: React.FC<ProxyContractInfoProps> = ({
             <div>
               <Text type="secondary">Implementation Contract:</Text>
               <br />
-              <AddressLink address={proxyInfo.implementationAddress} />
+              <AddressLink
+                address={proxyInfo.implementationAddress}
+                showCopy={true}
+              />
             </div>
           )}
 
@@ -193,7 +196,7 @@ export const ProxyContractInfo: React.FC<ProxyContractInfoProps> = ({
             <div>
               <Text type="secondary">Admin Address:</Text>
               <br />
-              <AddressLink address={proxyInfo.adminAddress} />
+              <AddressLink address={proxyInfo.adminAddress} showCopy={true} />
             </div>
           )}
 
@@ -266,7 +269,7 @@ export const ProxyContractInfo: React.FC<ProxyContractInfoProps> = ({
             showHistoryButton={true}
           />
           <Text type="secondary" style={{ fontSize: "12px" }}>
-            The ABI should be a valid JSON array containing the contract's
+            The ABI should be a valid JSON array containing the contract&apos;s
             function definitions.
           </Text>
         </Space>

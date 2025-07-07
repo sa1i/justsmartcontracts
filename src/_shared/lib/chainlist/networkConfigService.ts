@@ -1,4 +1,5 @@
 import { NetworkConfig } from "./types";
+import { getPresetNetworks, getEthereumMainnetConfig } from "./preset-adapter";
 
 const STORAGE_KEY = "network_config_cache";
 const LAST_UPDATE_KEY = "network_config_last_update";
@@ -59,12 +60,26 @@ export class NetworkConfigService {
       return config;
     } catch (error) {
       console.warn(
-        "Failed to fetch from Chainlist, falling back to default networks:",
+        "Failed to fetch from Chainlist, falling back to preset networks:",
         error
       );
     }
 
-    // 回退到默认网络配置
+    // 回退到预置网络配置
+    const presetNetworks = getPresetNetworks();
+    if (presetNetworks.length > 0) {
+      const config: NetworkConfigCache = {
+        networks: presetNetworks,
+        lastUpdate: Date.now(),
+        source: "default",
+      };
+
+      this.saveToStorage(config);
+      this.cache = config;
+      return config;
+    }
+
+    // 最终回退到默认网络配置
     const defaultNetworks = await this.loadDefaultNetworks();
     const config: NetworkConfigCache = {
       networks: defaultNetworks,
@@ -95,7 +110,22 @@ export class NetworkConfigService {
       this.cache = config;
       return config;
     } catch (error) {
-      console.error("Failed to force update from Chainlist:", error);
+      console.error("Failed to force update from Chainlist, using preset networks:", error);
+      
+      // 使用预置网络数据作为回退
+      const presetNetworks = getPresetNetworks();
+      if (presetNetworks.length > 0) {
+        const config: NetworkConfigCache = {
+          networks: presetNetworks,
+          lastUpdate: Date.now(),
+          source: "default",
+        };
+
+        this.saveToStorage(config);
+        this.cache = config;
+        return config;
+      }
+      
       throw error;
     }
   }
@@ -104,6 +134,13 @@ export class NetworkConfigService {
    * 获取默认网络配置
    */
   async getDefaultNetworks(): Promise<NetworkConfig[]> {
+    // 优先使用预置网络
+    const presetNetworks = getPresetNetworks();
+    if (presetNetworks.length > 0) {
+      return presetNetworks;
+    }
+    
+    // 回退到传统默认网络加载方式
     return this.loadDefaultNetworks();
   }
 

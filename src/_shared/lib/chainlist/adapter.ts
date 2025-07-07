@@ -1,93 +1,104 @@
-import { defineChain } from "viem";
-import { Chain as WagmiChain } from "wagmi";
+import { defineChain, Chain as WagmiChain } from "viem";
 import { NetworkConfig, NetworkPermission } from "./types";
-import { Chain } from "../web3/chains";
 
 /**
  * 将 NetworkConfig 转换为 Viem Chain 定义
  */
-export function networkConfigToViemChain(network: NetworkConfig): WagmiChain {
-  return defineChain({
-    id: network.chainId,
-    name: network.name,
-    network: network.shortName,
-    nativeCurrency: {
-      decimals: network.nativeCurrency.decimals,
-      name: network.nativeCurrency.name,
-      symbol: network.nativeCurrency.symbol,
-    },
-    rpcUrls: {
-      default: {
-        http: network.rpcUrls.filter((url) => url.startsWith("http")),
-        webSocket: network.rpcUrls.filter((url) => url.startsWith("ws")),
+export function networkConfigToViemChain(network: NetworkConfig): WagmiChain | null {
+  if (!network || !network.chainId || !network.name) {
+    console.warn('Invalid network config:', network);
+    return null;
+  }
+
+  try {
+    // 验证必要的字段
+    if (typeof network.chainId !== 'number' || network.chainId <= 0) {
+      console.warn('Invalid chainId:', network.chainId);
+      return null;
+    }
+
+    if (!network.rpcUrls || !Array.isArray(network.rpcUrls) || network.rpcUrls.length === 0) {
+      console.warn('No valid RPC URLs for network:', network.name);
+      return null;
+    }
+
+    const httpRpcs = network.rpcUrls.filter((url) => url && typeof url === 'string' && url.startsWith("http"));
+    const wsRpcs = network.rpcUrls.filter((url) => url && typeof url === 'string' && url.startsWith("ws"));
+
+    if (httpRpcs.length === 0) {
+      console.warn('No HTTP RPC URLs found for network:', network.name);
+      return null;
+    }
+
+    const chainConfig = {
+      id: network.chainId,
+      name: network.name,
+      network: network.shortName || network.name.toLowerCase(),
+      nativeCurrency: {
+        decimals: network.nativeCurrency?.decimals || 18,
+        name: network.nativeCurrency?.name || "ETH",
+        symbol: network.nativeCurrency?.symbol || "ETH",
       },
-      public: {
-        http: network.rpcUrls.filter((url) => url.startsWith("http")),
-        webSocket: network.rpcUrls.filter((url) => url.startsWith("ws")),
+      rpcUrls: {
+        default: {
+          http: httpRpcs,
+          webSocket: wsRpcs,
+        },
+        public: {
+          http: httpRpcs,
+          webSocket: wsRpcs,
+        },
       },
-    },
-    blockExplorers: network.blockExplorers
-      ? {
-          default: {
-            name: network.blockExplorers[0]?.name || "Explorer",
-            url: network.blockExplorers[0]?.url || "",
-          },
-          etherscan: network.blockExplorers.find(
-            (e) => e.standard === "EIP3091"
-          )
-            ? {
-                name: network.blockExplorers.find(
-                  (e) => e.standard === "EIP3091"
-                )!.name,
-                url: network.blockExplorers.find(
-                  (e) => e.standard === "EIP3091"
-                )!.url,
-              }
-            : undefined,
-        }
-      : undefined,
-    testnet: network.testnet,
-  });
+      blockExplorers: network.blockExplorers && network.blockExplorers.length > 0
+        ? {
+            default: {
+              name: network.blockExplorers[0]?.name || "Explorer",
+              url: network.blockExplorers[0]?.url || "",
+            },
+          }
+        : undefined,
+      testnet: network.testnet || false,
+    };
+
+    // 验证 chainConfig 在传给 defineChain 之前
+    if (typeof chainConfig.id !== 'number' || chainConfig.id <= 0) {
+      console.error('Invalid chainConfig.id before defineChain:', chainConfig.id);
+      return null;
+    }
+
+    const result = defineChain(chainConfig);
+    
+    // 验证结果
+    if (!result || typeof result.id === 'undefined' || result.id !== network.chainId) {
+      console.error('defineChain returned invalid result:', {
+        input: chainConfig,
+        output: result,
+        expectedId: network.chainId
+      });
+      return null;
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error converting network config to viem chain:', error, network);
+    return null;
+  }
 }
 
 /**
- * 尝试将 NetworkConfig 映射到现有的 Chain 枚举
+ * 将 NetworkConfig 映射到链 ID（移除了预置枚举映射）
  */
-export function mapNetworkToChainEnum(network: NetworkConfig): Chain | null {
-  // 根据 chainId 映射到现有的 Chain 枚举
-  const chainIdMap: Record<number, Chain> = {
-    1: Chain.ETHEREUM,
-    5: Chain.ETH_GOERLI,
-    10: Chain.OPTIMISM,
-    56: Chain.BSC,
-    137: Chain.POLYGON,
-    42161: Chain.ARBITRUM,
-    43114: Chain.AVALANCHE,
-    11155111: Chain.ETH_SEPOLIA,
-    80001: Chain.POLYGON_MUMBAI,
-    8453: Chain.BASE,
-    25: Chain.CRONOS,
-    534352: Chain.SCROLL,
-    169: Chain.MANTA,
-    5000: Chain.MANTLE,
-    59144: Chain.LINEA,
-    1313161554: Chain.AURORA,
-    66: Chain.OKXCHAIN,
-    1285: Chain.MOONRIVER,
-    288: Chain.BOBA,
-    128: Chain.HECO,
-    543210: Chain.ZERO,
-    1514: Chain.STORY,
-  };
-
-  return chainIdMap[network.chainId] || null;
+export function mapNetworkToChainEnum(network: NetworkConfig): number {
+  // 现在直接返回 chainId，不再映射到预置枚举
+  return network.chainId;
 }
 
 /**
- * 检查网络是否被当前系统支持
+ * 检查网络是否被当前系统支持（现在所有网络都被支持）
  */
 export function isNetworkSupported(network: NetworkConfig): boolean {
-  return mapNetworkToChainEnum(network) !== null;
+  // 现在所有有效的网络配置都被支持
+  return network.chainId > 0 && network.rpcUrls.length > 0;
 }
 
 /**

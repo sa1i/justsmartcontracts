@@ -1,10 +1,12 @@
 import { ParamValue, TAbiEvent, TEventLogs } from "@entities/contract";
-import { Chain, getTxUrl } from "@shared/lib/web3";
+import { getTxUrl } from "@shared/lib/web3/chainConfig";
 import { ExternalLink } from "@shared/ui/ExternalLink";
 import { Table } from "antd";
+import { useNetworks } from "@shared/lib/chainlist/store";
+import { NetworkConfig } from "@shared/lib/chainlist/types";
 
 type TProps = {
-  chain: Chain;
+  chainId: number;
   event: TAbiEvent;
   items: TEventLogs;
   loading?: boolean;
@@ -12,7 +14,9 @@ type TProps = {
 
 const ROW_KEY = "__rowKey";
 
-export const EventsTable = ({ chain, event, items, loading }: TProps) => {
+export const EventsTable = ({ chainId, event, items, loading }: TProps) => {
+  const { networks } = useNetworks();
+  const network = networks.find(n => n.chainId === chainId);
   const columns = event.inputs.map((input, index) => ({
     title: input.name || `Param ${index}`,
     dataIndex: input.name || index,
@@ -35,12 +39,12 @@ export const EventsTable = ({ chain, event, items, loading }: TProps) => {
       title: "TxHash",
       dataIndex: "transactionHash",
       key: "transactionHash",
-      render: (txHash: string) => (
-        <ExternalLink href={getTxUrl(chain, txHash)}>{`${txHash.slice(
-          0,
-          10
-        )}...`}</ExternalLink>
-      ),
+      render: (txHash: string) => {
+        const url = network ? getTxUrl(network, txHash) : `#${txHash}`;
+        return (
+          <ExternalLink href={url}>{`${txHash.slice(0, 10)}...`}</ExternalLink>
+        );
+      },
     },
   ];
 

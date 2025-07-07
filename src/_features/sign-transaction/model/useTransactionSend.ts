@@ -2,7 +2,7 @@ import { TTransactionParams, stringToNative } from "@shared/lib/tx";
 import { useCallback, useState } from "react";
 import { useSendTransaction, useConfig } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
-import { Chain, THexString } from "@shared/lib/web3";
+import { THexString } from "@shared/lib/web3";
 import { walletModel } from "@entities/wallet";
 import {
   useNetworkSelection,
@@ -43,7 +43,7 @@ export const usePrepareTransactionSend = (tx?: TTransactionParams) => {
   };
 };
 
-export const useTransactionSend = (fallbackChain: Chain) => {
+export const useTransactionSend = (fallbackChainId: number) => {
   const [txHash, setTxHash] = useState("");
   const [lastError, setLastError] = useState<Error | null>(null);
   const {
@@ -56,10 +56,10 @@ export const useTransactionSend = (fallbackChain: Chain) => {
   const notify = useNotifications();
   const config = useConfig();
 
-  // 使用当前选中的网络，如果没有选中则使用fallback chain
+  // 使用当前选中的网络，如果没有选中则使用fallback chainId
   const chainToUse = selectedNetwork
-    ? mapNetworkToChainEnum(selectedNetwork) || fallbackChain
-    : fallbackChain;
+    ? mapNetworkToChainEnum(selectedNetwork)
+    : fallbackChainId;
 
   const switchChain = walletModel.useSwitchWalletChain(chainToUse);
   console.log("==> switchChain:", switchChain);

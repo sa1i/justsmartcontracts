@@ -1,57 +1,31 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Chain } from "@shared/lib/web3";
+
+// 已弃用：现在使用动态网络配置，这个 store 已不再使用
+// 请使用 useNetworkSelection 从 @shared/lib/chainlist/store
 
 type State = {
-  chain: Chain;
+  chainId: number;
 };
 
 type Actions = {
-  update: (_chain: Chain) => void;
+  update: (_chainId: number) => void;
 };
 
-export const SupportedChains = [
-  Chain.ETHEREUM,
-  Chain.ETH_GOERLI,
-  Chain.ETH_SEPOLIA,
-  Chain.ARBITRUM,
-  Chain.AVALANCHE,
-  Chain.BSC,
-  Chain.BOBA,
-  Chain.HECO,
-  Chain.OPTIMISM,
-  Chain.POLYGON,
-  // Chain.ZKSYNC,
-  Chain.POLYGON_MUMBAI,
-  Chain.CRONOS,
-  Chain.BASE,
-  // Chain.KAVA,
-  Chain.MANTA,
-  // Chain.GNOSIS,
-  // Chain.CELO,
-  Chain.MANTLE,
-  // Chain.FANTOM,
-  // Chain.MOONBEAM,
-  Chain.LINEA,
-  // Chain.METIS,
-  // Chain.ASTAR,
-  // Chain.CANTO,
-  Chain.AURORA,
-  // Chain.TELOS,
-  Chain.OKXCHAIN,
-  Chain.MOONRIVER,
-  Chain.ZERO,
-  Chain.STORY,
-];
+// 已弃用：现在所有网络都通过动态配置支持
+export const SupportedChains: number[] = [];
 
 const useCurrentChainStore = create<State & Actions>()(
   persist(
     (set) => ({
-      chain: SupportedChains[0],
-      update: (chain: Chain) => set(() => ({ chain })),
+      chainId: 1, // 默认以太坊主网
+      update: (chainId: number) => set(() => ({ chainId })),
     }),
     { name: "chain" }
   )
 );
 
-export const useCurrentChain = () => useCurrentChainStore((state) => state);
+export const useCurrentChain = () => {
+  console.warn('useCurrentChain is deprecated, use useNetworkSelection instead');
+  return useCurrentChainStore((state) => state);
+};

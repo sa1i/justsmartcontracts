@@ -38,9 +38,9 @@ export const SupportedNetworksInfo: React.FC<SupportedNetworksInfoProps> = ({
         chain,
         name: config.name,
         chainId: chain,
-        symbol: config.nativeCurrency?.symbol || "ETH",
+        symbol: "ETH", // 默认使用 ETH
         testnet: config.testnet || false,
-        explorer: config.blockExplorers?.default?.url || "",
+        explorer: config.explorer || "",
       };
     });
   };
@@ -58,7 +58,7 @@ export const SupportedNetworksInfo: React.FC<SupportedNetworksInfoProps> = ({
         <Space>
           <Text strong>{name}</Text>
           {record.testnet && (
-            <Tag color="orange" size="small">
+            <Tag color="orange">
               Testnet
             </Tag>
           )}

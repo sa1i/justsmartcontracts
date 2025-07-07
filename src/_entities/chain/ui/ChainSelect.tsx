@@ -1,35 +1,40 @@
 import { Select } from "antd";
-import { Chain, getChainConfig } from "@shared/lib/web3";
 import { TValueInput } from "@shared/lib/props";
-import { SupportedChains } from "../model";
+import { useNetworks } from "@shared/lib/chainlist/store";
+import { getNetworkConfig } from "@shared/lib/web3/chainConfig";
 
 type TChainOption = {
-  value: Chain;
+  value: number;
   label: string;
   testnet: number;
 };
 
 const compareItems = (a: TChainOption, b: TChainOption) => {
   if (a.testnet === b.testnet) {
-    return Number(a.value) - Number(b.value);
+    return a.value - b.value;
   }
 
   return a.testnet - b.testnet;
 };
 
-const ChainOptions: TChainOption[] = [...SupportedChains]
-  .map((chain) => ({
-    value: chain,
-    label: getChainConfig(chain).name,
-    testnet: getChainConfig(chain).testnet ? 1 : 0,
-  }))
-  .sort(compareItems);
-
-type TProps = TValueInput<Chain> & {};
+type TProps = TValueInput<number> & {};
 
 export const ChainSelect = ({ value, onChange }: TProps) => {
-  const options = ChainOptions.filter(({ testnet }) => !testnet);
-  const testnetOptions = ChainOptions.filter(({ testnet }) => testnet);
+  const { networks } = useNetworks();
+
+  const chainOptions: TChainOption[] = networks
+    .map((network) => {
+      const config = getNetworkConfig(network);
+      return {
+        value: network.chainId,
+        label: config.name,
+        testnet: config.testnet ? 1 : 0,
+      };
+    })
+    .sort(compareItems);
+
+  const options = chainOptions.filter(({ testnet }) => !testnet);
+  const testnetOptions = chainOptions.filter(({ testnet }) => testnet);
 
   return (
     <Select

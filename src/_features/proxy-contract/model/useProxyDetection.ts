@@ -88,7 +88,7 @@ export const useProxyDetection = () => {
 
           const allRpcs = [
             ...rpcs,
-            ...viemChain.rpcUrls.default.http.map((url) => ({
+            ...viemChain.rpcUrls.default.http.map((url: string) => ({
               url,
               name: "Default",
             })),

@@ -149,7 +149,7 @@ export const NetworkPermissionsManager: React.FC<
       title: "Contract Interaction",
       key: "permission",
       width: 150,
-      render: (_, record: NetworkPermissionRow) => {
+      render: (_: any, record: NetworkPermissionRow) => {
         const { network, userPermission, currentStatus } = record;
 
         return (
@@ -172,7 +172,7 @@ export const NetworkPermissionsManager: React.FC<
       title: "Status",
       key: "status",
       width: 120,
-      render: (_, record: NetworkPermissionRow) => {
+      render: (_: any, record: NetworkPermissionRow) => {
         const { currentStatus } = record;
 
         if (currentStatus.allowed) {
@@ -189,7 +189,7 @@ export const NetworkPermissionsManager: React.FC<
     {
       title: "Reason",
       key: "reason",
-      render: (_, record: NetworkPermissionRow) => {
+      render: (_: any, record: NetworkPermissionRow) => {
         const { network, userPermission } = record;
 
         if (!userPermission.isUserOverride) {

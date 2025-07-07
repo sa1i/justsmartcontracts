@@ -120,12 +120,12 @@ export const RpcSwitcher: React.FC<RpcSwitcherProps> = ({
             </Space>
             <Space>
               {rpc.isCustom && (
-                <Tag size="small" color="blue">
+                <Tag color="blue">
                   Custom
                 </Tag>
               )}
               {rpc.isDefault && (
-                <Tag size="small" color="green">
+                <Tag color="green">
                   Default
                 </Tag>
               )}

@@ -83,7 +83,7 @@ export const NetworkPanel: React.FC<NetworkPanelProps> = ({
           <span>{rpc.name}</span>
           {index === selectedRpcIndex && <Text type="success">●</Text>}
           {rpc.isCustom && (
-            <Tag size="small" color="blue">
+            <Tag color="blue">
               Custom
             </Tag>
           )}

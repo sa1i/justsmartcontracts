@@ -301,9 +301,9 @@ export const NetworkRpcCard: React.FC<{
                     icon={!selectedNetwork.icon ? <GlobalOutlined /> : undefined}
                   />
                   <Text strong>{selectedNetwork.name}</Text>
-                  <Tag size="small">ID: {selectedNetwork.chainId}</Tag>
+                  <Tag>ID: {selectedNetwork.chainId}</Tag>
                   {selectedNetwork.testnet && (
-                    <Tag size="small" color="orange">
+                    <Tag color="orange">
                       Testnet
                     </Tag>
                   )}
@@ -319,12 +319,12 @@ export const NetworkRpcCard: React.FC<{
                     <ApiOutlined />
                     <Text strong>{currentRpc.name}</Text>
                     {currentRpc.isCustom && (
-                      <Tag size="small" color="blue">
+                      <Tag color="blue">
                         Custom
                       </Tag>
                     )}
                     {currentRpc.isDefault && (
-                      <Tag size="small" color="green">
+                      <Tag color="green">
                         Default
                       </Tag>
                     )}

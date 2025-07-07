@@ -1,4 +1,4 @@
-import { Chain, TAddress } from "@shared/lib/web3";
+import { TAddress } from "@shared/lib/web3";
 import { useCallback } from "react";
 import { useWalletClient, useAccount } from "wagmi";
 import { useNetworkSelection } from "@shared/lib/chainlist/store";
@@ -12,15 +12,15 @@ export const useCurrentWallet = (): TWalletModel => {
   return { address: address || null };
 };
 
-export const useSwitchWalletChain = (chain: Chain) => {
+export const useSwitchWalletChain = (chainId: number) => {
   const { data: walletClient } = useWalletClient();
 
   const switchIfNeeded = useCallback(async () => {
     if (walletClient) {
       try {
         const walletChain = await walletClient.getChainId();
-        if (walletChain !== Number(chain)) {
-          await walletClient.switchChain({ id: Number(chain) });
+        if (walletChain !== chainId) {
+          await walletClient.switchChain({ id: chainId });
         }
         return true;
       } catch (e) {
@@ -28,7 +28,7 @@ export const useSwitchWalletChain = (chain: Chain) => {
       }
     }
     return false;
-  }, [chain, walletClient]);
+  }, [chainId, walletClient]);
 
   return switchIfNeeded;
 };

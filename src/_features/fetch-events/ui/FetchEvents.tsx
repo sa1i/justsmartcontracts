@@ -20,7 +20,7 @@ export const FetchEvents = ({ contract, event }: TProps) => {
     <>
       <EventArgsForm onSubmit={submit} event={event} loading={loading} />
       <EventsTable
-        chain={contract.chain}
+        chainId={contract.chain}
         event={event}
         items={events}
         loading={loading}

@@ -1,20 +1,19 @@
-import { chainModel } from "@entities/chain";
+import { chainIdModel } from "@entities/chainId";
 import { contractModel } from "@entities/contract";
-import { Chain } from "@shared/lib/web3";
 import { useCallback } from "react";
 
 export const useUpdateChain = () => {
-  const { chain, update } = chainModel.useCurrentChain();
+  const { chainId, update } = chainIdModel.useCurrentChain();
   const { setCurrent, contracts } = contractModel.useContracts();
 
   return useCallback(
-    (newChain: Chain) => {
-      if (newChain != chain) {
-        const newCurrent = contracts.find((item) => item.chain == newChain);
+    (newChainId: number) => {
+      if (newChainId != chainId) {
+        const newCurrent = contracts.find((item) => item.chainId == newChainId);
         setCurrent(newCurrent?.id ?? null);
-        update(newChain);
+        update(newChainId);
       }
     },
-    [chain, contracts, setCurrent, update]
+    [chainId, contracts, setCurrent, update]
   );
 };
