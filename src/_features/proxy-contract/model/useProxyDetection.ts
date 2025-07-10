@@ -46,6 +46,12 @@ export const useProxyDetection = () => {
       try {
         // 创建使用选择网络的客户端
         const viemChain = networkConfigToViemChain(selectedNetwork);
+        if (!viemChain) {
+          throw new Error(
+            "Failed to convert network configuration to Viem chain"
+          );
+        }
+
         const rpcs = getCurrentNetworkRpcs();
         const selectedRpc = rpcs[selectedRpcIndex] || rpcs[0];
 

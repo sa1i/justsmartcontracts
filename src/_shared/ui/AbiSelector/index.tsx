@@ -1,6 +1,21 @@
 import React, { useState } from "react";
-import { Button, Select, Input, Space, Typography, Tag, Tooltip, Modal, message } from "antd";
-import { HistoryOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Select,
+  Input,
+  Space,
+  Typography,
+  Tag,
+  Tooltip,
+  Modal,
+  message,
+} from "antd";
+import {
+  HistoryOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { useAbiStorage } from "@shared/lib/abi-storage";
 import { TSavedAbi } from "@shared/lib/abi-storage/types";
 
@@ -24,16 +39,19 @@ export const AbiSelector: React.FC<TAbiSelectorProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const filteredAbis = searchQuery 
-    ? savedAbis.filter(abi => 
-        abi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        abi.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        abi.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredAbis = searchQuery
+    ? savedAbis.filter(
+        (abi) =>
+          abi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          abi.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          abi.tags?.some((tag) =>
+            tag.toLowerCase().includes(searchQuery.toLowerCase())
+          )
       )
     : savedAbis;
 
   const handleSelect = (abiId: string) => {
-    const selectedAbi = savedAbis.find(abi => abi.id === abiId);
+    const selectedAbi = savedAbis.find((abi) => abi.id === abiId);
     if (selectedAbi && onChange) {
       onChange(selectedAbi.abi);
       markAsUsed(abiId);
@@ -60,23 +78,28 @@ export const AbiSelector: React.FC<TAbiSelectorProps> = ({
   };
 
   const renderAbiItem = (abi: TSavedAbi) => (
-    <div key={abi.id} className="abi-item" style={{ 
-      padding: "8px 12px", 
-      borderBottom: "1px solid #f0f0f0",
-      cursor: "pointer",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-    onClick={() => handleSelect(abi.id)}
+    <div
+      key={abi.id}
+      className="abi-item"
+      style={{
+        padding: "8px 12px",
+        borderBottom: "1px solid #f0f0f0",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+      onClick={() => handleSelect(abi.id)}
     >
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Text strong>{abi.name}</Text>
           {abi.tags && abi.tags.length > 0 && (
             <div>
-              {abi.tags.map(tag => (
-                <Tag key={tag} size="small" color="blue">{tag}</Tag>
+              {abi.tags.map((tag) => (
+                <Tag key={tag} color="blue">
+                  {tag}
+                </Tag>
               ))}
             </div>
           )}
@@ -88,7 +111,8 @@ export const AbiSelector: React.FC<TAbiSelectorProps> = ({
         )}
         <div style={{ marginTop: "4px" }}>
           <Text type="secondary" style={{ fontSize: "11px" }}>
-            Created: {formatDate(abi.createdAt)} | Last used: {formatDate(abi.lastUsedAt)}
+            Created: {formatDate(abi.createdAt)} | Last used:{" "}
+            {formatDate(abi.lastUsedAt)}
           </Text>
         </div>
       </div>
@@ -136,7 +160,9 @@ export const AbiSelector: React.FC<TAbiSelectorProps> = ({
           {filteredAbis.length === 0 ? (
             <div style={{ textAlign: "center", padding: "32px" }}>
               <Text type="secondary">
-                {searchQuery ? "No ABIs match your search" : "No saved ABIs found"}
+                {searchQuery
+                  ? "No ABIs match your search"
+                  : "No saved ABIs found"}
               </Text>
             </div>
           ) : (

@@ -262,7 +262,7 @@ export const NetworkDemoPage: React.FC = () => {
                   Traditional selector with chainlist integration
                 </Paragraph>
                 <EnhancedChainSelect
-                  value={selectedChain}
+                  value={selectedChain || 1}
                   onChange={setSelectedChain}
                   showNetworkSelector={true}
                 />
@@ -402,7 +402,6 @@ export const NetworkDemoPage: React.FC = () => {
                       description={selectedNetwork.redFlags.join(", ")}
                       type="warning"
                       showIcon
-                      size="small"
                     />
                   )}
 
@@ -486,7 +485,6 @@ export const NetworkDemoPage: React.FC = () => {
                               contractStatus.allowed ? "success" : "warning"
                             }
                             showIcon
-                            size="small"
                           />
                         </Space>
                       );
@@ -528,16 +526,8 @@ export const NetworkDemoPage: React.FC = () => {
                     >
                       <Space>
                         <Text strong>{rpc.name}</Text>
-                        {index === 0 && (
-                          <Tag color="green" size="small">
-                            Active
-                          </Tag>
-                        )}
-                        {rpc.isCustom && (
-                          <Tag color="blue" size="small">
-                            Custom
-                          </Tag>
-                        )}
+                        {index === 0 && <Tag color="green">Active</Tag>}
+                        {rpc.isCustom && <Tag color="blue">Custom</Tag>}
                       </Space>
                       <div>
                         <Text
@@ -561,10 +551,9 @@ export const NetworkDemoPage: React.FC = () => {
 
           {/* Network & RPC Status Card */}
           {selectedNetwork && (
-            <NetworkRpcCard
-              title="Network & RPC Status"
-              style={{ marginTop: 16 }}
-            />
+            <div style={{ marginTop: 16 }}>
+              <NetworkRpcCard title="Network & RPC Status" />
+            </div>
           )}
         </Col>
       </Row>

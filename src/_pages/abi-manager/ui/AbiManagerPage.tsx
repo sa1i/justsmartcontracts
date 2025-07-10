@@ -1,26 +1,26 @@
 import React, { useState } from "react";
-import { 
-  Button, 
-  Card, 
-  Input, 
-  Space, 
-  Table, 
-  Tag, 
-  Typography, 
-  Modal, 
-  Form, 
+import {
+  Button,
+  Card,
+  Input,
+  Space,
+  Table,
+  Tag,
+  Typography,
+  Modal,
+  Form,
   message,
   Upload,
-  Tooltip
+  Tooltip,
 } from "antd";
-import { 
-  SearchOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
-  ExportOutlined, 
+import {
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ExportOutlined,
   ImportOutlined,
   CopyOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useAbiStorage } from "@shared/lib/abi-storage";
 import { TSavedAbi } from "@shared/lib/abi-storage/types";
@@ -36,11 +36,14 @@ export const AbiManagerPage: React.FC = () => {
   const [viewingAbi, setViewingAbi] = useState<TSavedAbi | null>(null);
   const [editForm] = Form.useForm();
 
-  const filteredAbis = searchQuery 
-    ? savedAbis.filter(abi => 
-        abi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        abi.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        abi.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredAbis = searchQuery
+    ? savedAbis.filter(
+        (abi) =>
+          abi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          abi.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          abi.tags?.some((tag) =>
+            tag.toLowerCase().includes(searchQuery.toLowerCase())
+          )
       )
     : savedAbis;
 
@@ -60,7 +63,9 @@ export const AbiManagerPage: React.FC = () => {
         await updateAbi(editingAbi.id, {
           name: values.name,
           description: values.description,
-          tags: values.tags ? values.tags.split(",").map((tag: string) => tag.trim()) : [],
+          tags: values.tags
+            ? values.tags.split(",").map((tag: string) => tag.trim())
+            : [],
         });
         message.success("ABI updated successfully!");
         setEditingAbi(null);
@@ -96,7 +101,7 @@ export const AbiManagerPage: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `abi-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `abi-export-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
       message.success("ABIs exported successfully!");
@@ -145,8 +150,10 @@ export const AbiManagerPage: React.FC = () => {
       key: "tags",
       render: (tags: string[]) => (
         <div>
-          {tags?.map(tag => (
-            <Tag key={tag} color="blue" size="small">{tag}</Tag>
+          {tags?.map((tag) => (
+            <Tag key={tag} color="blue">
+              {tag}
+            </Tag>
           ))}
         </div>
       ),
@@ -212,7 +219,14 @@ export const AbiManagerPage: React.FC = () => {
           </Text>
         </div>
 
-        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Input
             placeholder="Search ABIs by name, description, or tags..."
             prefix={<SearchOutlined />}
@@ -221,19 +235,17 @@ export const AbiManagerPage: React.FC = () => {
             style={{ width: "300px" }}
             allowClear
           />
-          
+
           <Space>
             <Upload
               accept=".json"
               beforeUpload={handleImport}
               showUploadList={false}
             >
-              <Button icon={<ImportOutlined />}>
-                Import ABIs
-              </Button>
+              <Button icon={<ImportOutlined />}>Import ABIs</Button>
             </Upload>
-            <Button 
-              icon={<ExportOutlined />} 
+            <Button
+              icon={<ExportOutlined />}
               onClick={handleExport}
               disabled={savedAbis.length === 0}
             >
@@ -249,7 +261,8 @@ export const AbiManagerPage: React.FC = () => {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} ABIs`,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} ABIs`,
           }}
         />
 
@@ -287,7 +300,11 @@ export const AbiManagerPage: React.FC = () => {
           open={!!viewingAbi}
           onCancel={() => setViewingAbi(null)}
           footer={[
-            <Button key="copy" icon={<CopyOutlined />} onClick={() => viewingAbi && handleCopy(viewingAbi)}>
+            <Button
+              key="copy"
+              icon={<CopyOutlined />}
+              onClick={() => viewingAbi && handleCopy(viewingAbi)}
+            >
               Copy ABI
             </Button>,
             <Button key="close" onClick={() => setViewingAbi(null)}>
@@ -308,16 +325,20 @@ export const AbiManagerPage: React.FC = () => {
                   {viewingAbi.tags && viewingAbi.tags.length > 0 && (
                     <div>
                       <Text strong>Tags:</Text>{" "}
-                      {viewingAbi.tags.map(tag => (
-                        <Tag key={tag} color="blue">{tag}</Tag>
+                      {viewingAbi.tags.map((tag) => (
+                        <Tag key={tag} color="blue">
+                          {tag}
+                        </Tag>
                       ))}
                     </div>
                   )}
                   <div>
-                    <Text strong>Created:</Text> {new Date(viewingAbi.createdAt).toLocaleString()}
+                    <Text strong>Created:</Text>{" "}
+                    {new Date(viewingAbi.createdAt).toLocaleString()}
                   </div>
                   <div>
-                    <Text strong>Last Used:</Text> {new Date(viewingAbi.lastUsedAt).toLocaleString()}
+                    <Text strong>Last Used:</Text>{" "}
+                    {new Date(viewingAbi.lastUsedAt).toLocaleString()}
                   </div>
                 </Space>
               </div>

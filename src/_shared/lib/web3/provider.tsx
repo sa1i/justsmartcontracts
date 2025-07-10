@@ -1,4 +1,5 @@
 import { WagmiProvider, createConfig, http, fallback } from "wagmi";
+import { defineChain } from "viem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { metaMask, injected } from "@wagmi/connectors";
 import { TWithChildren } from "../props";
@@ -56,9 +57,13 @@ const getAlchemyUrl = (chainId: number): string | null => {
 // 已废弃：使用 AllChainsSupportedWeb3Provider 代替
 export const Web3Provider = ({ children, chainId }: TProps) => {
   // 这个 Provider 已被弃用，建议使用 AllChainsSupportedWeb3Provider
-  console.warn('Web3Provider is deprecated, use AllChainsSupportedWeb3Provider instead');
-  
-  return <AllChainsSupportedWeb3Provider>{children}</AllChainsSupportedWeb3Provider>;
+  console.warn(
+    "Web3Provider is deprecated, use AllChainsSupportedWeb3Provider instead"
+  );
+
+  return (
+    <AllChainsSupportedWeb3Provider>{children}</AllChainsSupportedWeb3Provider>
+  );
 };
 
 // 增强版 Web3Provider，使用新的网络选择器
@@ -68,16 +73,52 @@ export const EnhancedWeb3Provider = ({ children }: TWithChildren) => {
 
   const config = useMemo(() => {
     if (!selectedNetwork) {
-      // 如果没有选择网络，返回空配置
+      // 如果没有选择网络，使用以太坊主网作为默认
+      const defaultChain = defineChain({
+        id: 1,
+        name: "Ethereum",
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+        rpcUrls: {
+          default: { http: ["https://eth.llamarpc.com"] },
+        },
+        blockExplorers: {
+          default: { name: "Etherscan", url: "https://etherscan.io" },
+        },
+      });
+
       return createConfig({
-        chains: [],
-        transports: {},
+        chains: [defaultChain],
+        transports: {
+          [defaultChain.id]: http(defaultChain.rpcUrls.default.http[0]),
+        },
         connectors: [metaMask(), injected()],
       });
     }
 
     // 转换选择的网络为 Viem Chain
     const viemChain = networkConfigToViemChain(selectedNetwork);
+    if (!viemChain) {
+      // 如果转换失败，使用默认链
+      const defaultChain = defineChain({
+        id: 1,
+        name: "Ethereum",
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+        rpcUrls: {
+          default: { http: ["https://eth.llamarpc.com"] },
+        },
+        blockExplorers: {
+          default: { name: "Etherscan", url: "https://etherscan.io" },
+        },
+      });
+
+      return createConfig({
+        chains: [defaultChain],
+        transports: {
+          [defaultChain.id]: http(defaultChain.rpcUrls.default.http[0]),
+        },
+        connectors: [metaMask(), injected()],
+      });
+    }
 
     // 获取当前网络的 RPC 列表
     const rpcs = getCurrentNetworkRpcs();
@@ -137,11 +178,25 @@ export const DynamicMultiChainWeb3Provider = ({ children }: TWithChildren) => {
       getNetworkContractStatus
     );
 
-    // 如果没有允许的链，返回空配置
+    // 如果没有允许的链，使用默认链
     if (allowedChains.length === 0) {
+      const defaultChain = defineChain({
+        id: 1,
+        name: "Ethereum",
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+        rpcUrls: {
+          default: { http: ["https://eth.llamarpc.com"] },
+        },
+        blockExplorers: {
+          default: { name: "Etherscan", url: "https://etherscan.io" },
+        },
+      });
+
       return createConfig({
-        chains: [],
-        transports: {},
+        chains: [defaultChain],
+        transports: {
+          [defaultChain.id]: http(defaultChain.rpcUrls.default.http[0]),
+        },
         connectors: [metaMask(), injected()],
       });
     }
@@ -217,27 +272,30 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
   // 确保在组件挂载时加载网络数据
   useEffect(() => {
     if (!networks || networks.length === 0) {
-      console.log('Fetching networks on mount...');
+      console.log("Fetching networks on mount...");
       fetchNetworks().catch(console.error);
     }
   }, [networks, fetchNetworks]);
 
   const config = useMemo(() => {
-    console.log('Creating wagmi config...', { 
-      isLoading, 
+    console.log("Creating wagmi config...", {
+      isLoading,
       networksCount: networks?.length,
-      selectedNetwork: selectedNetwork?.name 
+      selectedNetwork: selectedNetwork?.name,
     });
-    
+
     try {
       // 如果数据还在加载中，使用预置以太坊主网配置
       if (isLoading || !networks || networks.length === 0) {
-        console.log('Using Ethereum mainnet from preset - networks not ready');
+        console.log("Using Ethereum mainnet from preset - networks not ready");
         const ethereumConfig = getEthereumMainnetConfig();
         if (ethereumConfig) {
           const mainnetChain = networkConfigToViemChain(ethereumConfig);
           if (mainnetChain) {
-            const rpcUrl = ethereumConfig.rpcUrls.find(url => url.startsWith('https://')) || 'https://cloudflare-eth.com';
+            const rpcUrl =
+              ethereumConfig.rpcUrls.find((url) =>
+                url.startsWith("https://")
+              ) || "https://cloudflare-eth.com";
             return createConfig({
               chains: [mainnetChain],
               transports: { 1: http(rpcUrl) },
@@ -248,36 +306,41 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
         // 回退到基本配置
         const fallbackMainnet = {
           id: 1,
-          name: 'Ethereum',
-          network: 'homestead',
-          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+          name: "Ethereum",
+          network: "homestead",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
           rpcUrls: {
-            default: { http: ['https://cloudflare-eth.com'] },
-            public: { http: ['https://cloudflare-eth.com'] },
+            default: { http: ["https://cloudflare-eth.com"] },
+            public: { http: ["https://cloudflare-eth.com"] },
           },
         };
         return createConfig({
           chains: [fallbackMainnet],
-          transports: { 1: http('https://cloudflare-eth.com') },
+          transports: { 1: http("https://cloudflare-eth.com") },
           connectors: [metaMask(), injected()],
         });
       }
 
       // 获取所有支持的链和基础传输配置
-      console.log('Processing networks:', networks.length);
+      console.log("Processing networks:", networks.length);
       const allSupportedChains = getAllSupportedWagmiChains(networks);
       const baseTransports = getAllSupportedTransports(networks);
 
-      console.log('Supported chains count:', allSupportedChains.length);
+      console.log("Supported chains count:", allSupportedChains.length);
 
       // 验证链配置
       if (!allSupportedChains || allSupportedChains.length === 0) {
-        console.warn('No supported chains found, using Ethereum mainnet from preset');
+        console.warn(
+          "No supported chains found, using Ethereum mainnet from preset"
+        );
         const ethereumConfig = getEthereumMainnetConfig();
         if (ethereumConfig) {
           const mainnetChain = networkConfigToViemChain(ethereumConfig);
           if (mainnetChain) {
-            const rpcUrl = ethereumConfig.rpcUrls.find(url => url.startsWith('https://')) || 'https://cloudflare-eth.com';
+            const rpcUrl =
+              ethereumConfig.rpcUrls.find((url) =>
+                url.startsWith("https://")
+              ) || "https://cloudflare-eth.com";
             return createConfig({
               chains: [mainnetChain],
               transports: { 1: http(rpcUrl) },
@@ -288,45 +351,55 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
         // 回退到基本配置
         const fallbackMainnet = {
           id: 1,
-          name: 'Ethereum',
-          network: 'homestead',
-          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+          name: "Ethereum",
+          network: "homestead",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
           rpcUrls: {
-            default: { http: ['https://cloudflare-eth.com'] },
-            public: { http: ['https://cloudflare-eth.com'] },
+            default: { http: ["https://cloudflare-eth.com"] },
+            public: { http: ["https://cloudflare-eth.com"] },
           },
         };
         return createConfig({
           chains: [fallbackMainnet],
-          transports: { 1: http('https://cloudflare-eth.com') },
+          transports: { 1: http("https://cloudflare-eth.com") },
           connectors: [metaMask(), injected()],
         });
       }
 
       // 验证链的完整性
-      const validChains = allSupportedChains.filter(chain => {
-        if (!chain || typeof chain.id !== 'number' || chain.id <= 0 || !chain.name) {
-          console.warn('Invalid chain found:', {
+      const validChains = allSupportedChains.filter((chain) => {
+        if (
+          !chain ||
+          typeof chain.id !== "number" ||
+          chain.id <= 0 ||
+          !chain.name
+        ) {
+          console.warn("Invalid chain found:", {
             chain,
             hasChain: !!chain,
             idType: typeof chain?.id,
             idValue: chain?.id,
-            hasName: !!chain?.name
+            hasName: !!chain?.name,
           });
           return false;
         }
         return true;
       });
 
-      console.log('Valid chains:', validChains.length);
+      console.log("Valid chains:", validChains.length);
 
       if (validChains.length === 0) {
-        console.warn('No valid chains found after filtering, using Ethereum mainnet from preset');
+        console.warn(
+          "No valid chains found after filtering, using Ethereum mainnet from preset"
+        );
         const ethereumConfig = getEthereumMainnetConfig();
         if (ethereumConfig) {
           const mainnetChain = networkConfigToViemChain(ethereumConfig);
           if (mainnetChain) {
-            const rpcUrl = ethereumConfig.rpcUrls.find(url => url.startsWith('https://')) || 'https://cloudflare-eth.com';
+            const rpcUrl =
+              ethereumConfig.rpcUrls.find((url) =>
+                url.startsWith("https://")
+              ) || "https://cloudflare-eth.com";
             return createConfig({
               chains: [mainnetChain],
               transports: { 1: http(rpcUrl) },
@@ -337,43 +410,49 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
         // 回退到基本配置
         const fallbackMainnet = {
           id: 1,
-          name: 'Ethereum',
-          network: 'homestead',
-          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+          name: "Ethereum",
+          network: "homestead",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
           rpcUrls: {
-            default: { http: ['https://cloudflare-eth.com'] },
-            public: { http: ['https://cloudflare-eth.com'] },
+            default: { http: ["https://cloudflare-eth.com"] },
+            public: { http: ["https://cloudflare-eth.com"] },
           },
         };
         return createConfig({
           chains: [fallbackMainnet],
-          transports: { 1: http('https://cloudflare-eth.com') },
+          transports: { 1: http("https://cloudflare-eth.com") },
           connectors: [metaMask(), injected()],
         });
       }
 
       // 如果有选择的网络，为其自定义 RPC 配置
       if (selectedNetwork) {
-        console.log('Configuring RPC for selected network:', selectedNetwork.name);
+        console.log(
+          "Configuring RPC for selected network:",
+          selectedNetwork.name
+        );
         try {
           const rpcs = getCurrentNetworkRpcs();
           if (rpcs.length > 0) {
             const validRpcs = cleanRpcConfigs(rpcs);
             const rpcUrls = validRpcs.map((rpc) => rpc.url);
-            
+
             if (rpcUrls.length > 0) {
               baseTransports[selectedNetwork.chainId] = fallback(
                 rpcUrls.map((url) => http(url))
               );
-              console.log(`Configured custom RPCs for ${selectedNetwork.name}:`, rpcUrls);
+              console.log(
+                `Configured custom RPCs for ${selectedNetwork.name}:`,
+                rpcUrls
+              );
             }
           }
         } catch (rpcError) {
-          console.error('Error configuring custom RPC:', rpcError);
+          console.error("Error configuring custom RPC:", rpcError);
         }
       }
 
-      console.log('Creating wagmi config with', validChains.length, 'chains');
+      console.log("Creating wagmi config with", validChains.length, "chains");
 
       return createConfig({
         chains: validChains as any,
@@ -381,14 +460,17 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
         connectors: [metaMask(), injected()],
       });
     } catch (error) {
-      console.error('Error creating wagmi config:', error);
+      console.error("Error creating wagmi config:", error);
       // 如果出错，尝试使用预置以太坊主网配置
       try {
         const ethereumConfig = getEthereumMainnetConfig();
         if (ethereumConfig) {
           const mainnetChain = networkConfigToViemChain(ethereumConfig);
           if (mainnetChain) {
-            const rpcUrl = ethereumConfig.rpcUrls.find(url => url.startsWith('https://')) || 'https://cloudflare-eth.com';
+            const rpcUrl =
+              ethereumConfig.rpcUrls.find((url) =>
+                url.startsWith("https://")
+              ) || "https://cloudflare-eth.com";
             return createConfig({
               chains: [mainnetChain],
               transports: { 1: http(rpcUrl) },
@@ -397,23 +479,23 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
           }
         }
       } catch (presetError) {
-        console.error('Error using preset config:', presetError);
+        console.error("Error using preset config:", presetError);
       }
-      
+
       // 最终回退配置
       const fallbackMainnet = {
         id: 1,
-        name: 'Ethereum',
-        network: 'homestead',
-        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        name: "Ethereum",
+        network: "homestead",
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
         rpcUrls: {
-          default: { http: ['https://cloudflare-eth.com'] },
-          public: { http: ['https://cloudflare-eth.com'] },
+          default: { http: ["https://cloudflare-eth.com"] },
+          public: { http: ["https://cloudflare-eth.com"] },
         },
       };
       return createConfig({
         chains: [fallbackMainnet],
-        transports: { 1: http('https://cloudflare-eth.com') },
+        transports: { 1: http("https://cloudflare-eth.com") },
         connectors: [metaMask(), injected()],
       });
     }
@@ -421,7 +503,11 @@ export const AllChainsSupportedWeb3Provider = ({ children }: TWithChildren) => {
 
   // 如果正在加载，显示加载状态
   if (isLoading && (!networks || networks.length === 0)) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading network configurations...</div>;
+    return (
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        Loading network configurations...
+      </div>
+    );
   }
 
   return (

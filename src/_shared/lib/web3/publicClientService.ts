@@ -29,12 +29,18 @@ export class PublicClientService {
     selectedRpcIndex: number = 0
   ): PublicClient {
     const cacheKey = `${network.chainId}-${selectedRpcIndex}`;
-    
+
     if (this.clientCache.has(cacheKey)) {
       return this.clientCache.get(cacheKey)!;
     }
 
     const viemChain = networkConfigToViemChain(network);
+    if (!viemChain) {
+      throw new Error(
+        `Failed to convert network configuration to Viem chain for ${network.name}`
+      );
+    }
+
     const selectedRpc = rpcs[selectedRpcIndex] || rpcs[0];
 
     // 确定使用的 RPC URL
@@ -54,7 +60,9 @@ export class PublicClientService {
       throw new Error(`Invalid RPC URL: ${validation.error}`);
     }
 
-    console.log(`Creating PublicClient for ${network.name} with RPC: ${rpcUrl}`);
+    console.log(
+      `Creating PublicClient for ${network.name} with RPC: ${rpcUrl}`
+    );
 
     const client = createPublicClient({
       chain: viemChain,
@@ -74,7 +82,12 @@ export class PublicClientService {
     selectedRpcIndex: number = 0
   ): Promise<PublicClient> {
     const viemChain = networkConfigToViemChain(network);
-    
+    if (!viemChain) {
+      throw new Error(
+        `Failed to convert network configuration to Viem chain for ${network.name}`
+      );
+    }
+
     // 构建所有可用的 RPC 列表
     const allRpcs = [
       ...rpcs,
@@ -92,7 +105,9 @@ export class PublicClientService {
 
         // 测试连接
         await client.getBlockNumber();
-        console.log(`Successfully connected to ${network.name} via ${selectedRpc.url}`);
+        console.log(
+          `Successfully connected to ${network.name} via ${selectedRpc.url}`
+        );
         return client;
       } catch (error) {
         console.warn(`Primary RPC ${selectedRpc.url} failed:`, error);
@@ -117,7 +132,9 @@ export class PublicClientService {
 
         // 测试连接
         await client.getBlockNumber();
-        console.log(`Fallback connection successful to ${network.name} via ${rpc.url}`);
+        console.log(
+          `Fallback connection successful to ${network.name} via ${rpc.url}`
+        );
         return client;
       } catch (error) {
         console.warn(`RPC ${rpc.url} failed:`, error);
@@ -139,10 +156,10 @@ export class PublicClientService {
    * 移除特定网络的缓存
    */
   clearNetworkCache(chainId: number): void {
-    const keysToDelete = Array.from(this.clientCache.keys()).filter(key => 
+    const keysToDelete = Array.from(this.clientCache.keys()).filter((key) =>
       key.startsWith(`${chainId}-`)
     );
-    keysToDelete.forEach(key => this.clientCache.delete(key));
+    keysToDelete.forEach((key) => this.clientCache.delete(key));
   }
 }
 
@@ -150,7 +167,8 @@ export class PublicClientService {
  * React Hook 用于获取当前选择网络的 PublicClient
  */
 export const useSelectedNetworkPublicClient = () => {
-  const { selectedNetwork, getCurrentNetworkRpcs, selectedRpcIndex } = useNetworkSelection();
+  const { selectedNetwork, getCurrentNetworkRpcs, selectedRpcIndex } =
+    useNetworkSelection();
 
   const publicClient = useMemo(() => {
     if (!selectedNetwork) {
@@ -174,7 +192,8 @@ export const useSelectedNetworkPublicClient = () => {
  * React Hook 用于获取带故障转移的 PublicClient
  */
 export const useSelectedNetworkPublicClientWithFallback = () => {
-  const { selectedNetwork, getCurrentNetworkRpcs, selectedRpcIndex } = useNetworkSelection();
+  const { selectedNetwork, getCurrentNetworkRpcs, selectedRpcIndex } =
+    useNetworkSelection();
 
   const createClient = useMemo(() => {
     if (!selectedNetwork) {
@@ -184,7 +203,11 @@ export const useSelectedNetworkPublicClientWithFallback = () => {
     return async () => {
       const rpcs = getCurrentNetworkRpcs();
       const service = PublicClientService.getInstance();
-      return service.createClientWithFallback(selectedNetwork, rpcs, selectedRpcIndex);
+      return service.createClientWithFallback(
+        selectedNetwork,
+        rpcs,
+        selectedRpcIndex
+      );
     };
   }, [selectedNetwork, getCurrentNetworkRpcs, selectedRpcIndex]);
 
@@ -201,6 +224,10 @@ export const executeWithRpcFallback = async <T>(
   selectedRpcIndex: number = 0
 ): Promise<T> => {
   const service = PublicClientService.getInstance();
-  const client = await service.createClientWithFallback(network, rpcs, selectedRpcIndex);
+  const client = await service.createClientWithFallback(
+    network,
+    rpcs,
+    selectedRpcIndex
+  );
   return operation(client);
 };

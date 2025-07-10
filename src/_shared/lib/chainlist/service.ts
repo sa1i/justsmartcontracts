@@ -157,7 +157,7 @@ export function generateRpcConfigs(network: NetworkConfig): RpcConfig[] {
 
       // console.log(`network config :`, network);
       // console.log(`network config url:`, url);
-      const urlString = url.url || url;
+      const urlString = url;
       if (typeof urlString !== "string") {
         console.error(
           `Invalid RPC URL type for ${network.name} at index ${index}:`,

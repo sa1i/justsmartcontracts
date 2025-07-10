@@ -7,7 +7,7 @@ import { mapNetworkToChainEnum } from "@shared/lib/chainlist/adapter";
 export const useCurrentChainContracts = () => {
   const { selectedNetwork } = useNetworkSelection();
   const { contracts } = contractModel.useContracts();
-  const { chain: fallbackChain } = chainModel.useCurrentChain();
+  const { chainId: fallbackChain } = chainModel.useCurrentChain();
 
   return useMemo(() => {
     if (!selectedNetwork) {

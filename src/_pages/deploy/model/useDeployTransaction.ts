@@ -17,13 +17,13 @@ import {
 
 export const useDeployTransaction = () => {
   const { data: walletClient } = useWalletClient();
-  const { chain } = chainModel.useCurrentChain();
+  const { chainId } = chainModel.useCurrentChain();
   const { selectedNetwork } = useNetworkSelection();
   const { getNetworkPermission } = useNetworkPermissions();
 
   const [hash, setHash] = useState<THexString | undefined>(undefined);
 
-  const switchChain = walletModel.useSwitchWalletChain(chain);
+  const switchChain = walletModel.useSwitchWalletChain(chainId);
   const notify = useNotifications();
 
   const sendTransaction = async (
@@ -72,7 +72,7 @@ export const useDeployTransaction = () => {
     }
   };
 
-  useWatchTxNotification(chain, hash);
+  useWatchTxNotification(chainId, hash);
 
   return sendTransaction;
 };
